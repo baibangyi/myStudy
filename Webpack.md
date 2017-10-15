@@ -649,6 +649,425 @@ src/index.js
 
 > 懒加载或者按需加载，是一种很好的优化网页或应用的方式。这种方式实际上是先把你的代码在一些逻辑断点处分离开，然后在一些代码块中完成某些操作后，立即引用或即将引用另外一些新的代码块。这样加快了应用的初始加载速度，减轻了它的总体体积，因为某些代码块可能永远不会被加载
 
+## 缓存
+### 什么是缓存
+一种名为缓存的技术。可以通过命中缓存，以降低网络流量，使网站加载速度更快
+
+### 输出文件的文件名(Output Filenames)
+通过使用 output.filename 进行文件名替换，可以确保浏览器获取到修改后的文件，使用 [chunkhash] 替换，在文件名中包含一个 chunk 相关(chunk-specific)的哈希
+
+webpack.config.js
+ const path = require('path');
+  const CleanWebpackPlugin = require('clean-webpack-plugin');
+  const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+  module.exports = {
+
+        entry: './src/index.js',
+        plugins: [
+          new CleanWebpackPlugin(['dist']),
+          new HtmlWebpackPlugin({
+    -       title: 'Output Management'
+    +       title: 'Caching'
+          })
+        ],
+        output: {
+    -     filename: 'bundle.js',
+    +     filename: '[name].[chunkhash].js',
+          path: path.resolve(__dirname, 'dist')
+        }
+      };
+      //运行 npm run build，但如果不做修改，hash值依然会变
+      
+### 提取模板(Extracting Boilerplate)
+
+> CommonsChunkPlugin 有一个较少有人知道的功能是，能够在每次修改后的构建结果中，将 webpack 的样板(boilerplate，指 webpack 运行时的引导代码)和 manifest 提取出来。通过指定 entry 配置中未用到的名称，此插件会自动将我们需要的内容提取到单独的包中
+
+webpack.config.js
+
+    const path = require('path');
+    + const webpack = require('webpack');
+      const CleanWebpackPlugin = require('clean-webpack-plugin');
+      const HtmlWebpackPlugin = require('html-webpack-plugin');
+    
+      module.exports = {
+        entry: './src/index.js',
+        plugins: [
+          new CleanWebpackPlugin(['dist']),
+          new HtmlWebpackPlugin({
+            title: 'Caching'
+    -     })
+    +     }),
+    +     new webpack.optimize.CommonsChunkPlugin({
+    +       name: 'runtime'
+    +     })
+        ],
+        output: {
+          filename: '[name].[chunkhash].js',
+          path: path.resolve(__dirname, 'dist')
+        }
+      };
+
+运行结果
+
+    Hash: 80552632979856ddab34
+    Version: webpack 3.3.0
+    Time: 1512ms
+                              Asset       Size  Chunks                    Chunk Names
+       main.5ec8e954e32d66dee1aa.js     542 kB       0  [emitted]  [big]  main
+    runtime.719796322be98041fff2.js    5.82 kB       1  [emitted]         runtime
+                         index.html  275 bytes          [emitted]
+       [0] ./src/index.js 336 bytes {0} [built]
+       [2] (webpack)/buildin/global.js 509 bytes {0} [built]
+       [3] (webpack)/buildin/module.js 517 bytes {0} [built]
+        + 1 hidden module
+        
+将第三方库(library)（例如 lodash 或 react）提取到单独的 vendor chunk 文件中，是比较推荐的做法，这是因为，它们很少像本地的源代码那样频繁修改
+
+webpack.config.js
+
+      var path = require('path');
+      const webpack = require('webpack');
+      const CleanWebpackPlugin = require('clean-webpack-plugin');
+      const HtmlWebpackPlugin = require('html-webpack-plugin');
+    
+      module.exports = {
+    -   entry: './src/index.js',
+    +   entry: {
+    +     main: './src/index.js',
+    +     vendor: [
+    +       'lodash'
+    +     ]
+    +   },
+        plugins: [
+          new CleanWebpackPlugin(['dist']),
+          new HtmlWebpackPlugin({
+            title: 'Caching'
+          }),
+    +     new webpack.optimize.CommonsChunkPlugin({
+    +       name: 'vendor'
+    +     }),
+          new webpack.optimize.CommonsChunkPlugin({
+            name: 'runtime'
+          })
+        ],
+        output: {
+          filename: '[name].[chunkhash].js',
+          path: path.resolve(__dirname, 'dist')
+        }
+      };
+      
+打包之后
+   
+
+       Hash: 69eb92ebf8935413280d
+        Version: webpack 3.3.0
+        Time: 1502ms
+                                  Asset       Size  Chunks                    Chunk Names
+         vendor.8196d409d2f988123318.js     541 kB       0  [emitted]  [big]  vendor
+           main.0ac0ae2d4a11214ccd19.js  791 bytes       1  [emitted]         main
+        runtime.004a1114de8bcf026622.js    5.85 kB       2  [emitted]         runtime
+                             index.html  352 bytes          [emitted]
+           [1] ./src/index.js 336 bytes {1} [built]
+           [2] (webpack)/buildin/global.js 509 bytes {0} [built]
+           [3] (webpack)/buildin/module.js 517 bytes {0} [built]
+           [4] multi lodash 28 bytes {0} [built]
+            + 1 hidden module
+            
+### 模块标识符(Module Identifiers)
+向项目中再添加一个模块 print.js
+
+print.js
+
+    + export default function print(text) {
+    +   console.log(text);
+    + };
+
+修改index.js
+
+    src/index.js
+    import _ from 'lodash';
+    + import Print from './print';
+    
+      function component() {
+        var element = document.createElement('div');
+    
+        // lodash 是由当前 script 脚本 import 导入进来的
+        element.innerHTML = _.join(['Hello', 'webpack'], ' ');
+    +   element.onClick = Print.bind(null, 'Hello webpack!');
+    
+        return element;
+      }
+    
+      document.body.appendChild(component());
+      //然而这样运行结果是所有文件的hash都变了
+      
+
+> 这是因为每个 module.id 会基于默认的解析顺序(resolve order)进行增量。也就是说，当解析顺序发生变化，ID
+> 也会随之改变。因此，简要概括：
+> 
+> main bundle 会随着自身的新增内容的修改，而发生变化。 vendor bundle 会随着自身的 module.id
+> 的修改，而发生变化。 runtime bundle 会因为当前包含一个新模块的引用，而发生变化。
+
+使用 HashedModuleIdsPlugin，推荐用于生产环境构建，laijiejue这类问题
+
+webpack.config.js
+
+    const path = require('path');
+      const webpack = require('webpack');
+      const CleanWebpackPlugin = require('clean-webpack-plugin');
+      const HtmlWebpackPlugin = require('html-webpack-plugin');
+    
+      module.exports = {
+        entry: {
+          main: './src/index.js',
+          vendor: [
+            'lodash'
+          ]
+        },
+        plugins: [
+          new CleanWebpackPlugin(['dist']),
+          new HtmlWebpackPlugin({
+            title: 'Caching'
+          }),
+    +     new webpack.HashedModuleIdsPlugin(),
+          new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor'
+          }),
+          new webpack.optimize.CommonsChunkPlugin({
+            name: 'runtime'
+          })
+        ],
+        output: {
+          filename: '[name].[chunkhash].js',
+          path: path.resolve(__dirname, 'dist')
+        }
+      };
+      
+## 创建 Library
+除了打包应用程序代码，webpack 还可以用于打包 JavaScript library。以下指南适用于希望流水线化(streamline)打包策略的 library 作者
+
+假设正在编写一个名为 webpack-numbers 的小的 library，可以将数字 1 到 5 转换为文本表示，反之亦然，例如将 2 转换为 'two'
+
+基本的项目结构可能如下所示：
+
+    +  |- webpack.config.js
+    +  |- package.json
+    +  |- /src
+    +    |- index.js
+    +    |- ref.json
+    
+初始化 npm，安装 webpack 和 lodash：
+
+> npm init -y
+npm install --save-dev webpack lodash
+
+src/ref.json
+
+    [{
+      "num": 1,
+      "word": "One"
+    }, {
+      "num": 2,
+      "word": "Two"
+    }, {
+      "num": 3,
+      "word": "Three"
+    }, {
+      "num": 4,
+      "word": "Four"
+    }, {
+      "num": 5,
+      "word": "Five"
+    }, {
+      "num": 0,
+      "word": "Zero"
+    }]
+    
+src/index.js
+
+    import _ from 'lodash';
+    import numRef from './ref.json';
+    
+    export function numToWord(num) {
+      return _.reduce(numRef, (accum, ref) => {
+        return ref.num === num ? ref.word : accum;
+      }, '');
+    };
+    
+    export function wordToNum(word) {
+      return _.reduce(numRef, (accum, ref) => {
+        return ref.word === word && word.toLowerCase() ? ref.num : accum;
+      }, -1);
+    };
+    
+该 library 的使用方式如下：
+
+    // ES2015 模块引入
+    import * as webpackNumbers from 'webpack-numbers';
+    // CommonJS 模块引入
+    var webpackNumbers = require('webpack-numbers');
+    // ...
+    // ES2015 和 CommonJS 模块调用
+    webpackNumbers.wordToNum('Two');
+    // ...
+    // AMD 模块引入
+    require(['webpackNumbers'], function ( webpackNumbers) {
+      // ...
+      // AMD 模块调用
+      webpackNumbers.wordToNum('Two');
+      // 通过 script 标签来加载和使用此 library
+      <script src="https://unpkg.com/webpack-numbers"></script>
+     <script>
+     // ...
+    // 全局变量
+    webpackNumbers.wordToNum('Five')
+    // window 对象中的属性
+    window.webpackNumbers.wordToNum('Five')
+    // ...
+  </script>
+  
+### 基本配置
+打包这个 library，能够实现以下几个目标：
+
+>  - 不打包 lodash，而是使用 externals 来 require 用户加载好的 lodash。
+>  
+>  - 设置 library 的名称为 webpack-numbers.
+>  
+>  - 设置 library 的名称为 webpack-numbers.
+>  
+>  - 设置 library 的名称为 webpack-numbers.
+>  
+>  - 将 library 暴露为一个名为 webpackNumbers的变量。
+>  
+>  - 能够访问其他 Node.js 中的 library
+
+此外，用户应该能够通过以下方式访问 library：
+
+ 
+
+> - ES2015 模块。例如 import webpackNumbers from 'webpack-numbers'。
+> - CommonJS 模块。例如 require('webpack-numbers').
+> - 全局变量，当通过 script 脚本引入时
+
+**从这个基本的 webpack 配置开始**
+
+webpack.config.js
+
+    var path = require('path');
+    
+    module.exports = {
+      entry: './src/index.js',
+      output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'webpack-numbers.js'
+      }
+    };
+    
+**外部化 lodash**
+
+> 执行 webpack，你会发现创建了一个非常巨大的文件。如果你查看这个文件，会看到 lodash 也被打包到代码中。在这种场景中，我们更倾向于把 lodash 当作 peerDependency。也就是说，用户应该已经将 lodash 安装好。因此，你可以放弃对外部 library 的控制，而是将控制权让给使用 library 的用户
+
+webpack.config.js
+
+      var path = require('path');
+    //可以使用 externals 配置来完成
+      module.exports = {
+        entry: './src/index.js',
+        output: {
+          path: path.resolve(__dirname, 'dist'),
+          filename: 'webpack-numbers.js'
+    -   }
+    +   },
+    +   externals: {
+    +     lodash: {
+    +       commonjs: 'lodash',
+    +       commonjs2: 'lodash',
+    +       amd: 'lodash',
+    +       root: '_'
+    +     }
+    +   }
+      };
+      //这意味着你的 library 需要一个名为 lodash 的依赖，这个依赖在用户的环境中必须存在且可用
+      
+**暴露 library**
+
+对于用途广泛的 library，我们希望它能够兼容不同的环境，例如 CommonJS，AMD，Node.js 或者作为一个全局变量。为了让你的 library 能够在各种用户环境(consumption)中可用，需要在 output 中添加 library 属性：
+
+webpack.config.js
+
+     var path = require('path');
+    
+      module.exports = {
+        entry: './src/index.js',
+        output: {
+          path: path.resolve(__dirname, 'dist'),
+    -     filename: 'webpack-numbers.js'
+    +     filename: 'webpack-numbers.js',
+    +     library: 'webpackNumbers'
+        },
+        externals: {
+          lodash: {
+            commonjs: 'lodash',
+            commonjs2: 'lodash',
+            amd: 'lodash',
+            root: '_'
+          }
+        }
+      };
+      
+当你在 import 引入模块时，这可以将你的 library bundle 暴露为名为 webpackNumbers 的全局变量。为了让 library 和其他环境兼容，还需要在配置文件中添加 libraryTarget 属性。这是可以控制 library 如何以不同方式暴露的选项。
+
+webpack.config.js
+  
+
+    var path = require('path');
+    
+      module.exports = {
+        entry: './src/index.js',
+        output: {
+          path: path.resolve(__dirname, 'dist'),
+          filename: 'webpack-numbers.js',
+    -     library: 'webpackNumbers'
+    +     library: 'webpackNumbers',
+    +     libraryTarget: 'umd'
+        },
+        externals: {
+          lodash: {
+            commonjs: 'lodash',
+            commonjs2: 'lodash',
+            amd: 'lodash',
+            root: '_'
+          }
+        }
+      };
+      
+
+> 可以通过以下方式暴露 library：
+> 
+>  - 遍历：作为一个全局变量，通过 script 标签来访问（libraryTarget:'var'）。
+>  
+>  - this：通过 this 对象访问（libraryTarget:'this'）。
+>  
+>  - window：通过 window 对象访问，在浏览器中（libraryTarget:'window'）。
+>  
+>  - UMD：在 AMD 或 CommonJS 的 require 之后可访问（libraryTarget:'umd'）。  
+
+ 如果设置了 library 但没设置 libraryTarget，则 libraryTarget 默认为 var，详细说明请查看
+ 
+**最终步骤**
+需要通过设置 package.json 中的 main 字段，添加生成 bundle 的文件路径
+
+package.json
+
+    {
+      ...
+      "main": "dist/webpack-numbers.js",
+      ...
+    }
+
+      
+
 
 
       
