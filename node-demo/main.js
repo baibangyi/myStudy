@@ -97,13 +97,41 @@
 
 // console.log('执行完毕')
 
-//链式流完成文件压缩/解压
+// //链式流完成文件压缩/解压
+// var fs = require('fs')
+// var zlib = require('zlib')
+
+// var readerStream = new fs.createReadStream('input.txt')
+
+// readerStream.pipe(zlib.createGzip())
+//             .pipe(fs.createWriteStream('input.txt.gz'))
+
+// console.log('文件压缩完成')
+
+
+//导出模块
+// var hello = require('hello')
+
+// hello = new hello()
+
+// hello.setName('Mr.Li')
+
+// hello.sayName()
+
+// console.log(__filename)
+
+// console.log(__dirname)
+
+//异步读取 
 var fs = require('fs')
-var zlib = require('zlib')
 
-var readerStream = new fs.createReadStream('input.txt')
+fs.readFile('input.txt', function(err, data) {
+	if(err) return console.error(err)
 
-readerStream.pipe(zlib.createGzip())
-            .pipe(fs.createWriteStream('input.txt.gz'))
+	console.log('异步读取文件' + data.toString())
+})
 
-console.log('文件压缩完成')
+var data = fs.readFileSync('input.txt')
+console.log('同步读取文件' + data.toString())
+
+console.log('程序执行完毕')
