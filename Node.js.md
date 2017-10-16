@@ -213,9 +213,6 @@ EventEmitter 的每个事件由一个事件名和若干个参数组成，事件�
     
 
 
-  [1]: http://www.runoob.com/nodejs/nodejs-npm.html
-  [2]: http://www.runoob.com/nodejs/nodejs-event.html
-  
 ### error 事件
 
 > EventEmitter 定义了一个特殊的事件 error，它包含了错误的语义，我们在遇到 异常的时候通常会触发 error 事件。
@@ -355,7 +352,538 @@ Node.js，Stream 有四种流类型：
       .pipe(fs.createWriteStream('input.txt'));
       
     console.log("文件解压完成。");
+    
+## Node.js模块系统
+为了让Node.js的文件可以相互调用，Node.js提供了一个简单的模块系统，一个 Node.js 文件就是一个模块
+
+### 创建模块
+就是创建一个文件，Node.js 提供了 exports 和 require 两个对象，其中 exports 是模块公开的接口，require 用于从外部获取一个模块的接口，即所获取模块的 exports 对象，有时候只是想把一个对象封装到模块中，格式如下：
+
+    module.exports = function() {
+      // ...
+    }
+    
+来一个例子
+
+    //hello.js 
+    function Hello() { 
+        var name; 
+        this.setName = function(thyName) { 
+            name = thyName; 
+        }; 
+        this.sayHello = function() { 
+            console.log('Hello ' + name); 
+        }; 
+    }; 
+    module.exports = Hello;
+    
+### 服务端的模块放在哪里
+Node.js 中自带了一个叫做 http 的模块，我们在我们的代码中请求它并把返回值赋给一个本地变量。这把我们的本地变量变成了一个拥有所有 http 模块所提供的公共方法的对象。
+
+由于 Node.js 中存在 4 类模块（原生模块和3种文件模块），尽管 require 方法极其简单，但是内部的加载却是十分复杂的，其加载优先级也各自不同，Node.js 的 require 方法中的文件查找策略基本就是：
+1.**从文件模块缓存中加载**：尽管原生模块与文件模块的优先级不同，但是都会优先于从文件模块的缓存中加载已经存在的模块。
+2.**从原生模块加载**：原生模块的优先级仅次于文件模块缓存的优先级。require 方法在解析文件名之后，优先检查模块是否在原生模块列表中。以http模块为例，尽管在目录下存在一个 http/http.js/http.node/http.json 文件，require("http") 都不会从这些文件中加载，而是从原生模块中加载。原生模块也有一个缓存区，同样也是优先从缓存区加载。如果缓存区没有被加载过，则调用原生模块的加载方式进行加载和执行。
+3.**从文件加载**：当文件模块缓存中不存在，而且不是原生模块的时候，Node.js 会解析 require 方法传入的参数，并从文件系统中加载实际的文件
+
+**require方法接受以下几种参数的传递：**
+
+ - http、fs、path等，原生模块。
+ - ./mod或../mod，相对路径的文件模块。
+ - /pathtomodule/mod，绝对路径的文件模块。
+ - mod，非原生模块的文件模块。
+
+## Node.js 路由
+我们要为路由提供请求的 URL 和其他需要的 GET 及 POST 参数，随后路由需要根据这些数据来执行相应的代码。
+
+我们需要的所有数据都会包含在 request 对象中，该对象作为 onRequest() 回调函数的第一个参数传递。但是为了解析这些数据，我们需要额外的 Node.JS 模块，它们分别是 url 和 querystring 模块。（解析器）
+
+例子：给 onRequest() 函数加上一些逻辑，找出浏览器请求的 URL 路径
+    
+    //server.js
+    var http = require("http");
+    var url = require("url");
+     
+    function start() {
+      function onRequest(request, response) {
+        var pathname = url.parse(request.url).pathname;
+        console.log("Request for " + pathname + " received.");
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        response.write("Hello World");
+        response.end();
+      }
+     
+      http.createServer(onRequest).listen(8888);
+      console.log("Server has started.");
+    }
+     
+    exports.start = start;
+    
+编写路由
+
+    //router.js
+    function route(pathname) {
+      console.log("About to route a request for " + pathname);
+    }
+    exports.route = route;
+    
+把路由和服务器整合起来，扩展一下server.js
+
+    var http = require("http");
+    var url = require("url");
+     
+    function start(route) {
+      function onRequest(request, response) {
+        var pathname = url.parse(request.url).pathname;
+        console.log("Request for " + pathname + " received.");
+     
+        route(pathname);
+     
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        response.write("Hello World");
+        response.end();
+      }
+     
+      http.createServer(onRequest).listen(8888);
+      console.log("Server has started.");
+    }
+     
+    exports.start = start;
+    
+同时，我们会相应扩展 index.js，使得路由函数可以被注入到服务器中：
+> var server = require("./server");
+> var router = require("./router");
+ 
+> server.start(router.route);
+
+启动应用
+
+> $ node index.js
+Server has started.
+
+浏览器访问 http://127.0.0.1:8888/，输出hello world
+
+## Node.js 全局对象
+ Node.js 中的全局对象是 global，所有全局变量（除了 global 本身以外）都是 global 对象的属性。
+ 
+### __filename
+
+> __filename 表示当前正在执行的脚本的文件名。它将输出文件所在位置的绝对路径，且和命令行参数所指定的文件名不一定相同。 如果在模块中，返回的值是模块文件的路径。
+
+### __dirname
+
+> __dirname 表示当前执行脚本所在的目录。
+
+### setTimeout(cb, ms)
+
+> setTimeout(cb, ms) 全局函数在指定的毫秒(ms)数后执行指定函数(cb)。：setTimeout() 只执行一次指定函数。
+> 返回一个代表定时器的句柄值。
+
+### setInterval(cb, ms)
+
+> setInterval(cb, ms) 全局函数在指定的毫秒(ms)数后执行指定函数(cb)。 返回一个代表定时器的句柄值。可以使用
+> clearInterval(t) 函数来清除定时器。 setInterval() 方法会不停地调用函数，直到 clearInterval()
+> 被调用或窗口被关闭。
+
+### console
+console方法详见[此处][3]
 
  
  
  
+ 
+
+
+  [1]: http://www.runoob.com/nodejs/nodejs-npm.html
+  [2]: http://www.runoob.com/nodejs/nodejs-event.html
+  [3]: http://www.runoob.com/nodejs/nodejs-global-object.html
+  
+
+### process
+
+> process 是一个全局变量，即 global 对象的属性。 它用于描述当前Node.js 进程状态的对象，提供了一个与操作系统的简单接口
+
+process事件
+
+ 1. exit
+ 2. beforeExit
+ 3. uncaughtException
+ 4. Signal 事件
+
+## Node.js 常用工具
+util 是一个Node.js 核心模块，提供常用函数的集合，用于弥补核心JavaScript 的功能 过于精简的不足。
+
+### util.inherits
+定义了一个基础对象Base 和一个继承自Base 的Sub，Base 有三个在构造函数 内定义的属性和一个原型中定义的函数，通过util.inherits 实现继承（Sub 仅仅继承了Base 在原型中定义的函数）
+
+    util.inherits(constructor, superConstructor)是一个实现对象间原型继承 的函数。
+    
+    var util = require('util'); 
+    function Base() { 
+        this.name = 'base'; 
+        this.base = 1991; 
+        this.sayHello = function() { 
+        console.log('Hello ' + this.name); 
+        }; 
+    } 
+    Base.prototype.showName = function() { 
+        console.log(this.name);
+    }; 
+    function Sub() { 
+        this.name = 'sub'; 
+    } 
+    util.inherits(Sub, Base); 
+    var objBase = new Base(); 
+    objBase.showName(); 
+    objBase.sayHello(); 
+    console.log(objBase); 
+    var objSub = new Sub(); 
+    objSub.showName(); 
+    //objSub.sayHello(); 
+    console.log(objSub); 
+    
+### util.inspect
+util.inspect(object,[showHidden],[depth],[colors])是一个将任意对象转换 为字符串的方法，通常用于调试和错误输出。它至少接受一个参数 object，即要转换的对象。
+
+    var util = require('util'); 
+    function Person() { 
+        this.name = 'byvoid'; 
+        this.toString = function() { 
+        return this.name; 
+        }; 
+    } 
+    var obj = new Person(); 
+    console.log(util.inspect(obj)); 
+    console.log(util.inspect(obj, true)); 
+    
+运行结果
+
+    Person { name: 'byvoid', toString: [Function] }
+    Person {
+      name: 'byvoid',
+      toString: 
+       { [Function]
+         [length]: 0,
+         [name]: '',
+         [arguments]: null,
+         [caller]: null,
+         [prototype]: { [constructor]: [Circular] } } }
+         
+### util.isArray(object)
+如果给定的参数 "object" 是一个数组返回true，否则返回false。
+
+### util.isRegExp(object)
+如果给定的参数 "object" 是一个正则表达式返回true，否则返回false。
+
+### util.isDate(object)
+如果给定的参数 "object" 是一个日期返回true，否则返回false。
+
+### util.isError(object)
+如果给定的参数 "object" 是一个错误对象返回true，否则返回false。
+
+## Node.js 文件系统
+### 导入文件系统
+
+    var fs = require("fs")
+    
+### 同步和异步
+Node.js 文件系统（fs 模块）模块中的方法均有异步和同步版本，例如读取文件内容的函数有异步的 fs.readFile() 和同步的 fs.readFileSync()。
+
+    var fs = require("fs");
+    
+    // 异步读取
+    fs.readFile('input.txt', function (err, data) {
+       if (err) {
+           return console.error(err);
+       }
+       console.log("异步读取: " + data.toString());
+    });
+    
+    // 同步读取
+    var data = fs.readFileSync('input.txt');
+    console.log("同步读取: " + data.toString());
+    
+    console.log("程序执行完毕。");
+
+### 打开文件
+
+    fs.open(path, flags[, mode], callback)
+    //flags - 文件打开的行为
+    
+例子：
+
+    var fs = require("fs");
+    
+    // 异步打开文件
+    console.log("准备打开文件！");
+    fs.open('input.txt', 'r+', function(err, fd) {
+       if (err) {
+           return console.error(err);
+       }
+      console.log("文件打开成功！");     
+    });
+    
+### 获取文件信息
+
+    fs.stat(path, callback)
+    
+fs.stat(path)执行后，会将stats类的实例返回给其回调函数。可以通过stats类中的提供方法判断文件的相关属性。例如判断是否为文件：
+
+    var fs = require('fs');
+    
+    fs.stat('/Users/liuht/code/itbilu/demo/fs.js', function (err, stats) {
+        console.log(stats.isFile());         //true
+    })
+    
+### 写入文件
+
+fs.writeFile(file, data[, options], callback)
+
+    var fs = require("fs");
+    
+    console.log("准备写入文件");
+    fs.writeFile('input.txt', '我是通过写入的文件内容！',  function(err) {
+       if (err) {
+           return console.error(err);
+       }
+       console.log("数据写入成功！");
+       console.log("--------我是分割线-------------")
+       console.log("读取写入的数据！");
+       fs.readFile('input.txt', function (err, data) {
+          if (err) {
+             return console.error(err);
+          }
+          console.log("异步读取文件数据: " + data.toString());
+       });
+    });
+
+### 读取文件
+
+    fs.read(fd, buffer, offset, length, position, callback)
+    //fd - 通过 fs.open() 方法返回的文件描述符。
+    //offset - 缓冲区写入的写入偏移量。
+    //position - 文件读取的起始位置，如果 position 的值为 null，则会从当前文件指针的位置读取。
+    
+例子
+   
+
+     var fs = require("fs");
+        var buf = new Buffer(1024);
+        
+        console.log("准备打开已存在的文件！");
+        fs.open('input.txt', 'r+', function(err, fd) {
+           if (err) {
+               return console.error(err);
+           }
+           console.log("文件打开成功！");
+           console.log("准备读取文件：");
+           fs.read(fd, buf, 0, buf.length, 0, function(err, bytes){
+              if (err){
+                 console.log(err);
+              }
+              console.log(bytes + "  字节被读取");
+              
+              // 仅输出读取的字节
+              if(bytes > 0){
+                 console.log(buf.slice(0, bytes).toString());
+              }
+           });
+        });
+        
+### 关闭文件
+
+    fs.close(fd, callback)
+    
+### 截取文件
+
+    fs.ftruncate(fd, len, callback)
+    
+### 删除文件
+
+    fs.unlink(path, callback)
+
+### 创建目录
+
+    fs.mkdir(path[, mode], callback)
+    
+例子：
+
+    var fs = require("fs");
+    
+    console.log("创建目录 /tmp/test/");
+    fs.mkdir("/tmp/test/",function(err){
+       if (err) {
+           return console.error(err);
+       }
+       console.log("目录创建成功。");
+    });
+    
+### 读取目录
+
+    fs.readdir(path, callback)
+    
+例子：
+
+    var fs = require("fs");
+    
+    console.log("查看 /tmp 目录");
+    fs.readdir("/tmp/",function(err, files){
+       if (err) {
+           return console.error(err);
+       }
+       files.forEach( function (file){
+           console.log( file );
+       });
+    });
+    
+### 删除目录
+
+    fs.rmdir(path, callback)
+    
+## Node.js GET/POST请求
+### 获取GET请求内容
+node.js 中 url 模块中的 parse 函数提供了这个功能。
+
+    var http = require('http');
+    var url = require('url');
+    var util = require('util');
+     
+    http.createServer(function(req, res){
+        res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'});
+        res.end(util.inspect(url.parse(req.url, true)));
+    }).listen(3000);
+    
+获取 URL 的参数
+
+    var http = require('http');
+    var url = require('url');
+    var util = require('util');
+     
+    http.createServer(function(req, res){
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+     
+        // 解析 url 参数
+        var params = url.parse(req.url, true).query;
+        res.write("网站名：" + params.name);
+        res.write("\n");
+        res.write("网站 URL：" + params.url);
+        res.end();
+     
+    }).listen(3000);
+    
+    ### 获取 POST 请求内容
+  
+
+      var http = require('http');
+    var querystring = require('querystring');
+     
+    http.createServer(function(req, res){
+        // 定义了一个post变量，用于暂存请求体的信息
+        var post = '';     
+     
+        // 通过req的data事件监听函数，每当接受到请求体的数据，就累加到post变量中
+        req.on('data', function(chunk){    
+            post += chunk;
+        });
+     
+        // 在end事件触发后，通过querystring.parse将post解析为真正的POST请求格式，然后向客户端返回。
+        req.on('end', function(){    
+            post = querystring.parse(post);
+            res.end(util.inspect(post));
+        });
+    }).listen(3000);
+    
+    ## Node.js Web 模块
+    
+
+> Web服务器一般指网站服务器，是指驻留于因特网上某种类型计算机的程序，Web服务器的基本功能就是提供Web信息浏览服务。它只需支持HTTP协议、HTML文档格式及URL，与客户端的网络浏览器配合。
+
+### Web 应用架构
+
+ - Client - 客户端，一般指浏览器，浏览器可以通过 HTTP 协议向服务器请求数据。
+ - Server - 服务端，一般指 Web 服务器，可以接收客户端请求，并向客户端发送响应数据。
+ - Business - 业务层， 通过 Web 服务器处理应用程序，如与数据库交互，逻辑运算，调用外部程序等
+ - Data - 数据层，一般由数据库组成
+
+### 使用 Node 创建 Web 服务器
+
+    var http = require('http');
+    var fs = require('fs');
+    var url = require('url');
+    
+    
+    // 创建服务器
+    http.createServer( function (request, response) {  
+       // 解析请求，包括文件名
+       var pathname = url.parse(request.url).pathname;
+       
+       // 输出请求的文件名
+       console.log("Request for " + pathname + " received.");
+       
+       // 从文件系统中读取请求的文件内容
+       fs.readFile(pathname.substr(1), function (err, data) {
+          if (err) {
+             console.log(err);
+             // HTTP 状态码: 404 : NOT FOUND
+             // Content Type: text/plain
+             response.writeHead(404, {'Content-Type': 'text/html'});
+          }else{             
+             // HTTP 状态码: 200 : OK
+             // Content Type: text/plain
+             response.writeHead(200, {'Content-Type': 'text/html'});    
+             
+             // 响应文件内容
+             response.write(data.toString());        
+          }
+          //  发送响应数据
+          response.end();
+       });   
+    }).listen(8081);
+    
+    // 控制台会输出以下信息
+    console.log('Server running at http://127.0.0.1:8081/');
+    
+    接下来我们在该目录下创建一个 index.htm 文件，代码如下：
+        <html>
+    <head>
+    <title>Sample Page</title>
+    </head>
+    <body>
+    Hello World!
+    </body>
+    </html>
+
+浏览器中打开地址：http://127.0.0.1:8081/index.htm
+
+### 使用 Node 创建 Web 客户端
+
+    var http = require('http');
+    
+    // 用于请求的选项
+    var options = {
+       host: 'localhost',
+       port: '8081',
+       path: '/index.htm'  
+    };
+    
+    // 处理响应的回调函数
+    var callback = function(response){
+       // 不断更新数据
+       var body = '';
+       response.on('data', function(data) {
+          body += data;
+       });
+       
+       response.on('end', function() {
+          // 数据接收完成
+          console.log(body);
+       });
+    }
+    // 向服务端发送请求
+    var req = http.request(options, callback);
+    req.end();
+    
+
+
+ 
+ 
+  
