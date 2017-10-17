@@ -1228,8 +1228,345 @@ server.js 文件代码：
      
     app.listen(8081)
     
+## Node.js RESTful API
+### 什么是 REST？
+REST即表述性状态传递，是Roy Fielding博士在2000年他的博士论文中提出来的一种软件架构风格
 
+> 表述性状态转移是一组架构约束条件和原则。满足这些约束条件和原则的应用程序或设计就是RESTful。需要注意的是，REST是设计风格而不是标准。REST通常基于使用HTTP，URI，和XML（标准通用标记语言下的一个子集）以及HTML（标准通用标记语言下的一个应用）这些现有的广泛流行的协议和标准。REST 通常使用 JSON 数据格式
 
+**HTTP 方法**
+
+ - GET - 用于获取数据
+ - PUT - 用于更新或添加数据
+ - DELETE - 用于删除数据
+ - POST - 用于添加数据
+
+### 创建 RESTful
+
+创建一个 json 数据资源文件 users.json
+
+    {
+       "user1" : {
+          "name" : "mahesh",
+          "password" : "password1",
+          "profession" : "teacher",
+          "id": 1
+       },
+       "user2" : {
+          "name" : "suresh",
+          "password" : "password2",
+          "profession" : "librarian",
+          "id": 2
+       },
+       "user3" : {
+          "name" : "ramesh",
+          "password" : "password3",
+          "profession" : "clerk",
+          "id": 3
+       }
+    }
+    
+**获取用户列表**
+
+    var express = require('express');
+    var app = express();
+    var fs = require("fs");
+    
+    app.get('/listUsers', function (req, res) {
+       fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+           console.log( data );
+           res.end( data );
+       });
+    })
+    
+    var server = app.listen(8081, function () {
+    
+      var host = server.address().address
+      var port = server.address().port
+    
+      console.log("应用实例，访问地址为 http://%s:%s", host, port)
+    
+    })
+
+**添加用户**
+var express = require('express');
+var app = express();
+var fs = require("fs");
+
+//添加的新用户数据
+
+    var user = {
+       "user4" : {
+          "name" : "mohit",
+          "password" : "password4",
+          "profession" : "teacher",
+          "id": 4
+       }
+    }
+    
+    app.get('/addUser', function (req, res) {
+       // 读取已存在的数据
+       fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+           data = JSON.parse( data );
+           data["user4"] = user["user4"];
+           console.log( data );
+           res.end( JSON.stringify(data));
+       });
+    })
+    
+    var server = app.listen(8081, function () {
+    
+      var host = server.address().address
+      var port = server.address().port
+      console.log("应用实例，访问地址为 http://%s:%s", host, port)
+    
+    })
+    
+**显示用户详情**
+
+    var express = require('express');
+    var app = express();
+    var fs = require("fs");
+    
+    app.get('/:id', function (req, res) {
+       // 首先我们读取已存在的用户
+       fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+           data = JSON.parse( data );
+           var user = data["user" + req.params.id] 
+           console.log( user );
+           res.end( JSON.stringify(user));
+       });
+    })
+    
+    var server = app.listen(8081, function () {
+    
+      var host = server.address().address
+      var port = server.address().port
+      console.log("应用实例，访问地址为 http://%s:%s", host, port)
+    
+    })
+    
+**删除用户**
+
+    var express = require('express');
+    var app = express();
+    var fs = require("fs");
+    
+    var id = 2;
+    
+    app.get('/deleteUser', function (req, res) {
+    
+       // First read existing users.
+       fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+           data = JSON.parse( data );
+           delete data["user" + 2];
+           
+           console.log( data );
+           res.end( JSON.stringify(data));
+       });
+    })
+    
+    var server = app.listen(8081, function () {
+    
+      var host = server.address().address
+      var port = server.address().port
+      console.log("应用实例，访问地址为 http://%s:%s", host, port)
+    
+    })
+    
+## Node.js 连接 MySQL
+### 安装驱动
+
+    $ cnpm install mysql
+    
+### 连接数据库
+以下实例中修改根据你的实际配置修改数据库用户名、及密码及数据库名
+
+test.js 文件代码
+
+    var mysql      = require('mysql');
+    var connection = mysql.createConnection({
+      host     : 'localhost',
+      user     : 'root',
+      password : '123456',
+      database : 'test' //数据库名
+    });
+     
+    connection.connect();
+     
+    connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+      if (error) throw error;
+      console.log('The solution is: ', results[0].solution);
+    });
+    
+### 数据库操作( CURD )
+假定已经导入了一个websites.sql数据库
+
+**查询数据**
+
+    var mysql  = require('mysql');  
+     
+    var connection = mysql.createConnection({     
+      host     : 'localhost',       
+      user     : 'root',              
+      password : '123456',       
+      port: '3306',                   
+      database: 'test', 
+    }); 
+     
+    connection.connect();
+     
+    var  sql = 'SELECT * FROM websites';
+    //查
+    connection.query(sql,function (err, result) {
+            if(err){
+              console.log('[SELECT ERROR] - ',err.message);
+              return;
+            }
+     
+           console.log('--------------------------SELECT----------------------------');
+           console.log(result);
+           console.log('------------------------------------------------------------\n\n');  
+    });
+     
+    connection.end();
+    
+**插入数据**
+
+    var mysql  = require('mysql');  
+     
+    var connection = mysql.createConnection({     
+      host     : 'localhost',       
+      user     : 'root',              
+      password : '123456',       
+      port: '3306',                   
+      database: 'test', 
+    }); 
+     
+    connection.connect();
+     
+    var  addSql = 'INSERT INTO websites(Id,name,url,alexa,country) VALUES(0,?,?,?,?)';
+    var  addSqlParams = ['菜鸟工具', 'https://c.runoob.com','23453', 'CN'];
+    //增
+    connection.query(addSql,addSqlParams,function (err, result) {
+            if(err){
+             console.log('[INSERT ERROR] - ',err.message);
+             return;
+            }        
+     
+           console.log('--------------------------INSERT----------------------------');
+           //console.log('INSERT ID:',result.insertId);        
+           console.log('INSERT ID:',result);        
+           console.log('-----------------------------------------------------------------\n\n');  
+    });
+     
+    connection.end();
+    
+**更新数据**
+
+    var mysql  = require('mysql');  
+     
+    var connection = mysql.createConnection({     
+      host     : 'localhost',       
+      user     : 'root',              
+      password : '123456',       
+      port: '3306',                   
+      database: 'test', 
+    }); 
+     
+    connection.connect();
+     
+    var modSql = 'UPDATE websites SET name = ?,url = ? WHERE Id = ?';
+    var modSqlParams = ['菜鸟移动站', 'https://m.runoob.com',6];
+    //改
+    connection.query(modSql,modSqlParams,function (err, result) {
+       if(err){
+             console.log('[UPDATE ERROR] - ',err.message);
+             return;
+       }        
+      console.log('--------------------------UPDATE----------------------------');
+      console.log('UPDATE affectedRows',result.affectedRows);
+      console.log('-----------------------------------------------------------------\n\n');
+    });
+     
+    connection.end();
+
+**删除数据**
+
+    var mysql  = require('mysql');  
+     
+    var connection = mysql.createConnection({     
+      host     : 'localhost',       
+      user     : 'root',              
+      password : '123456',       
+      port: '3306',                   
+      database: 'test', 
+    }); 
+     
+    connection.connect();
+     
+    var delSql = 'DELETE FROM websites where id=6';
+    //删
+    connection.query(delSql,function (err, result) {
+            if(err){
+              console.log('[DELETE ERROR] - ',err.message);
+              return;
+            }        
+     
+           console.log('--------------------------DELETE----------------------------');
+           console.log('DELETE affectedRows',result.affectedRows);
+           console.log('-----------------------------------------------------------------\n\n');  
+    });
+     
+    connection.end();
+    
+## Node.js 连接 MongoDB
+MongoDB是一种文档导向数据库管理系统，由C++撰写而成
+### 安装驱动
+
+    $ cnpm install mongodb
+    
+### 数据库操作( CURD )
+与 MySQL 不同的是 MongoDB 会自动创建数据库和集合，所以使用前我们不需要手动去创建
+
+**插入数据**
+
+    var MongoClient = require('mongodb').MongoClient;
+    var DB_CONN_STR = 'mongodb://localhost:27017/runoob'; # 数据库为 runoob
+     
+    var insertData = function(db, callback) {  
+        //连接到表 site
+        var collection = db.collection('site');
+        //插入数据
+        var data = [{"name":"菜鸟教程","url":"www.runoob.com"},{"name":"菜鸟工具","url":"c.runoob.com"}];
+        collection.insert(data, function(err, result) { 
+            if(err)
+            {
+                console.log('Error:'+ err);
+                return;
+            }     
+            callback(result);
+        });
+    }
+     
+    MongoClient.connect(DB_CONN_STR, function(err, db) {
+        console.log("连接成功！");
+        insertData(db, function(result) {
+            console.log(result);
+            db.close();
+        });
+    });
+    
+**查询数据**
+用collection.find
+
+**更新数据**
+使用collection.update
+
+**删除数据**
+使用collection.remove
+
+ 
  
  
  
