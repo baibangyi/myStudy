@@ -29,3 +29,27 @@ AMD也是一种规范，Commonjs是服务器端的规范，那么AMD就是浏览
 
 ## XMLHttpRequest 对象
 XMLHttpRequest 对象用于在后台与服务器交换数据
+
+## CSS3 动画
+用百分比来规定变化发生的时间，或用关键词 "from" 和 "to"，等同于 0% 和 100%。
+
+    @keyframes myfirst
+    {
+    0%   {background: red;}
+    25%  {background: yellow;}
+    50%  {background: blue;}
+    100% {background: green;}
+    }
+
+属性说明：
+@keyframes：规定动画
+animation： 所有动画属性的简写属性，除了 animation-play-state 属性。
+animation-name： 规定 @keyframes 动画的名称。
+animation-duration： 规定动画完成一个周期所花费的秒或毫秒。默认是 0。
+animation-timing-function： 规定动画的速度曲线。默认是 "ease"。
+animation-delay：规定动画何时开始。默认是 0
+animation-iteration-count： 规定动画被播放的次数。默认是 1
+animation-direction： 规定动画是否在下一周期逆向地播放。默认是 "normal"
+animation-play-state： 规定动画是否正在运行或暂停。默认是 "running"。
+animation-fill-mode： 规定对象动画时间之外的状态。
+
