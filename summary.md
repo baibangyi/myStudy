@@ -8,6 +8,22 @@
 ## JS中使用typeof能得到哪些类型
 **考点**：JS变量类型
 
+### 值类型
+### 引用类型
+引用类型有对象，函数，数组
+引用类型的特点，无限制扩大属性
+### typeof 运算符
+typeof undefined // undefine
+typeof 'adc' // string
+typeof true // boolean
+typeof {} // object
+typeof [] //object
+typeof null // object
+typeof comsole.log //function
+typeof只能区分出值类型，引用类型不能区分，都是object
+
+### 变量计算 - 强制类型转换
+
 ## 何时使用 === 何时使用 ==
 **考点**： 强制类型转换
 
