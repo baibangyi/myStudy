@@ -141,13 +141,7 @@ function Foo(){...}： var Foo = new Function()的 语法糖
  函数：针对一个函数，在执行之前也会先把变量定义，函数声明、this、arguments提出来
  **this**：
  this是要在执行时确认的，定义时时无法确认的
- this使用场景：
  
-
-> 作为构造函数执行
- 作为对象属性执行
- 作为普通函数执行
- call apply bind（bind必须是函数表达式的形式，函数声明不可以）
 
  **作用域**
  没有块级作用域，即：
@@ -161,12 +155,99 @@ function Foo(){...}： var Foo = new Function()的 语法糖
  **作用域链**
  即子作用域和父作用域行程的作用域链，父作用域是在函数定义时规定的，不是函数执行的时候规定的
  **闭包**
+ 使用场景：
+ 函数作为返回值
+ 
 
-### 说一下对变量提升的卢杰
+    function fn () {
+         var  a = 100;
+         return function () {
+             console.log(a)  //a是自由变量，所以向父级寻找值
+         }
+     }
+     var f1 = fn() //此时f1就是返回的函数
+     var a = 200
+     f1() //100
+     
+函数作为参数传递
+
+    function F1() {
+        var a = 100;
+        return function () {
+            console.log(a)
+        }
+    }
+    
+    var f1 = F1()
+    
+    function F2(fn) {
+        var a = 200
+        fn()//此时是执行fn，而父级作用域是声明时的
+    } 
+    F2() //100
+
+### 说一下对变量提升的理解
+1.变量定义
+2.函数声明（声明和表达式的区别）
 ### 说明this 几种不同的使用场景
+this使用场景：
+ 
+
+> 作为构造函数执行
+ 作为对象属性执行
+ 作为普通函数执行
+ call apply bind（bind必须是函数表达式的形式，函数声明不可以）
 ### 创建 10 个<a>标签，点击的时候弹出来对应的序号
+
+    var i, a
+    for (i=0;i<10;i++){
+        (function(i){
+            //函数作用域
+            a = document.createElement('a')
+            a.innerHTML = i + '<br/>'
+            a.addEventListrner('click',function(){
+                console.log(i)//自由变量，要去父级查值
+            })
+            document.body.qppendChild('a')
+        })(i)//自执行函数只要定义之后，就会立即执行，不需要认为调用
+    }
+
 ### 如何理解作用域
+1.自由变量
+2.作用域链，即自由变量的查找
+2.闭包的两个场景
 ### 实际开发中闭包的应用
+
+    //闭包实际应用中主要用于封装变量，收敛权限
+    var isFirstLoad() {
+        var _list = []
+        return function() {
+            if(_list.indexOf(id >= 0) {
+                return false
+            } else {
+                _list.push(id)
+                return true
+            }
+        }
+    }
+    //使用
+    var firstLoad = isFirstLoad()
+    firstLoad(10)//true
+    firstLoad(10)//false
+    //即在函数外边根本不可能修改list的值
+    
+## 异步和单线程
+题目：
+### 同步和异步的区别是什么
+### 一个关于setTimeout的笔试题
+### 前端使用异步的场景有哪些
+知识点：
+**什么是异步**
+**前端使用异步的场景**
+1.定时任务：setTimeout，setInverval
+2.网络请求：ajax请求，动态<img>加载
+3.事件绑定：addEventListener ('click')
+**异步和单线程**
 
 
 
