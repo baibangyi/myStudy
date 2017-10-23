@@ -239,6 +239,8 @@ this使用场景：
 ## 异步和单线程
 题目：
 ### 同步和异步的区别是什么
+1.同步会阻塞代码执行，而异步不会
+2.alert是同步，setTimeout是异步
 ### 一个关于setTimeout的笔试题
 ### 前端使用异步的场景有哪些
 知识点：
@@ -248,7 +250,79 @@ this使用场景：
 2.网络请求：ajax请求，动态<img>加载
 3.事件绑定：addEventListener ('click')
 **异步和单线程**
+执行异步代码时，会依次执行，当执行到以上三点异步代码时，将异步代码放一边，接着执行，执行完整段代码后，在将放在一边的异步代码拿来执
+单线程就是一次只能做一件事
 
+## 其他内容
+### 题目：
+**获取2017-06-10 格式的日期**
+
+    function formatDate(dt){
+        if (!dt) {
+            dt = new Date()
+        }
+        var year = dt.getFullYear()
+        var month = dt.getMonth() + 1
+        var date = dt.getDate()
+        if(month< 10) {
+            month = '0' + month
+        }
+        if(date<10){
+            date = '0' + date
+        }
+        return year + '-' + month  + '-' + data
+    }
+    var dt = new Date()
+    var formatDate = formatDate(dt)
+    console.log(formatDate)
+
+**获取随机数，要求是长度一致的字符串格式**
+
+    var random = Math.random()
+    var random = random + '0000000000'
+    var random = random.slice(1, 10)
+    console.log(random)
+
+**写一个能遍历对象和数组的通用forEach 函数**
+
+    function forEach(obj,fn){
+        var key
+        if(obj instanceof Array){
+        obj.forEach(function(item, index){
+            console.log(index,item)
+        })
+        } else {
+            for(key in obj){
+                console.log(key,obj[key])
+            }
+        }
+    }
+
+### 知识点
+**日期函数**
+1.Date.now() //获取当前时间毫秒数
+2.var dt = new Date() 
+3.dt.getTime() //获取毫秒数
+4.dt.getFullYear() //年
+5.dt.getMonth() //月(0 - 11)
+6.dt.getDate() //日（0 - 31）
+7.dt.getHours() //小时（0 - 23）
+8.dt.getMinute() //分钟（0 - 59）
+9.dt.getSeconds() //秒（0 - 59）
+
+**Math**
+获取随机数Math.random（），返回0 - 1 之间的随机数
+
+**数组API**
+forEach 遍历所以元素
+every 判断所有元素是否都符合条件
+some 判断是否有至少一个元素符合条件
+sort 排序
+map 对元素重新组装，生成新数组
+filter 过滤符合条件的元素
+
+**对象API**
+for in
 
 
 
