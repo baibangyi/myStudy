@@ -324,5 +324,77 @@ filter 过滤符合条件的元素
 **对象API**
 for in
 
+## 从基础知识到JS-Wed-API
+### DOM
+**题目**：
+1.DOM是哪种基本的数据结构
+树
+2.DOM操作的常用API有哪些
+1.获取Dom节点，以及节点的prototype和Attribute
+2.获取父节点，获取子节点
+3.新增节点，删除节点
+DOM节点的attr 和 property 有何区别
+ 前者是针对html标签属性的修改和获取，后者是针对js对象属性的修改和获取
+
+
+**知识点**：
+1.DOM本质
+html是一种特殊xml
+DOM可以理解为浏览器把拿到的html代码，结构化为一个浏览器能识别并且js可操作的一个模型
+2.DOM节点操作
+**获取DOM节点**
+getElementById，querySelectorAll等
+**prototype**
+js对象上的属性
+所有获取的元素都是对象，所以可以扩展属性，例如style，nodename
+**Attribute**
+getAttribute，setAttribute
+获取的是html中的属性
+3.DOM结构操作
+**新增节点**
+createElement（）后appendChild（）
+**获取父元素**
+parentElement
+**获取子元素**
+childNode（包含nodeType，nodeName）
+**删除节点**
+removeChild（）
+
+ 知识点
+ ### BOM操作
+ **题目**：
+ 如何检测浏览器的类型
+ 
+
+    var ua = nvigator.userAgent
+     var isChrom = ua.indexof('Chrom')
+     console.log(isChrom)
+
+ 拆解url的各部分
+ 
+
+    location.href
+     location.protocol//'http','https'
+     location.host//域名
+     location.pathname//路径'/learn/199
+     location.search//url中？后面的参数
+     location.hash
+
+ 
+ **粗体文本**
+ navigator浏览器：
+ var ua = navigator.userAgent浏览器特性
+ screen屏幕：width屏幕大小
+ location本地：
+ location.href
+ location.protocol//'http','https'
+ location.host//域名
+ location.pathname//路径'/learn/199
+ location.search//url中？后面的参数
+ location.hash
+ history历史：
+ history.back()//返回
+ history.forward()//前进
+
 
 
