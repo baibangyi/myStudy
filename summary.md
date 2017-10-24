@@ -395,6 +395,116 @@ removeChild（）
  history历史：
  history.back()//返回
  history.forward()//前进
+ 
+ ## 事件
+ **题目**：
+ 1.编写一个通用的事件监听函数
+ 2.描述事件冒泡
+ 3.对于一个无限下拉加载图片的页面，如何给每个图片绑定页面
+ 
+ **知识点**
+ 1.通用事件绑定
+ 
+
+    function bindEvent(elem,type,fn){
+         elem.addEventListener(type,fn)
+     }
+     
+     var a = document.createElement('a')
+     bindEvent(a,'click',function(e){
+         e.preventDefault()//阻止默认行为
+         alert('clicked')
+     })
+
+ 2.事件冒泡
+ 如果子元素上有一个点击事件，父元素上也有一个点击事件，那么子元素上的点击事件就会冒泡到父元素上，如果要阻止事件冒泡，可以用e.stopPropatation()
+ 3.代理
+ 代理的优势：
+ 1.代码简洁
+ 2.减少浏览器内存占用
+ html页面代码：
+ 
+
+    <div id="div1">
+       <a href="#">a1</a>
+       <a href="#">a2</a>
+       <a href="#">a3</a>
+       <a href="#">a4</a>
+     </div>
+     
+js页面代码：
+
+    var div1 = document.getElementById('div1')
+    div1.addEventListener('click',function(e){
+        var target = e.target//时间代理，获取到真正被点击的元素
+        if(target.nodeName === A){
+            alert(target,innerHTML)
+        }
+    })
+    
+**完善的通用事件绑定函数**
+
+    function bindEvent(elem,type,selector,fn){
+        if(fn == null){
+            fn = selector
+            selector = null
+        }
+        elem.addEventListener(type,function(e){
+            var target
+            if(selector){
+                target = e.target
+                if(target.matches(selector)){
+                    //matches（）是说target是否符合selector标签
+                    fn.call(target,e)
+                }
+            } else {
+                fn(e)
+            }
+        })
+    }
+    
+    //使用代理
+    bindEvent(div1,'click','a',function(e){
+        console.log(this.innerHTML)
+        
+        //不适用代理
+        var a = document.createElement('a')
+        bindEvent(div1,'click',function(e){
+            console.log(a.innerHTML)
+        })
+    })
+    
+## Ajax
+**题目**：
+1.手动编写一个Ajax，不依赖第三方库
+2.跨域的几种实现方法
+
+**知识点**
+1.XMLHttpReqest
+2.状态吗说明
+readyDtate:
+0（未初始化）：还没有调用send（）方法
+1（载入）：已调用send（），正在发送请求
+2（载入完成）：send()方法执行完成，已经接收到全部相应内容
+3（交互）：正在解析相应内容
+4（完成）响应内容解析完成，可以在客户端调用了
+
+status:
+2xx:表示成功处理请求
+3xx：需要重定向，浏览器直接跳转
+4xx：客户端请求错误
+5xx：服务端错误
+3.跨域
+**什么是跨域**
+浏览器有同源策略，不允许ajax访问其他域的接口
+跨域条件：协议，域名，端口有一个不同就是跨域
+可以跨域的三个标签
+<img>:打点统计，统计网站可能是其他域
+<script>，<link>：都可以使用CDN，CDN的域名是其他域名
+<script>:用于JSONP
+**JSONP**
+**服务器端设置http hearder**
+ 
 
 
 
