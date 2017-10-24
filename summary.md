@@ -498,12 +498,50 @@ status:
 **什么是跨域**
 浏览器有同源策略，不允许ajax访问其他域的接口
 跨域条件：协议，域名，端口有一个不同就是跨域
+Ajax实现原理：
+
+    var xhr = new XMLHttpRequest()//生成一个对象
+    xhr.open("get","/api",false)
+    xhr.onreadystatechange = function(){
+        //这里是函数异步执行
+        if(xhr.readyState == 4) {
+            if(xhr.status == 200){
+                alert(xhr.responseText)
+            }
+        }
+    }
+
 可以跨域的三个标签
 <img>:打点统计，统计网站可能是其他域
 <script>，<link>：都可以使用CDN，CDN的域名是其他域名
 <script>:用于JSONP
 **JSONP**
-**服务器端设置http hearder**
+实现原理：
+在script标签里请求地址并加上一个不存在的动态文件地址，如：http://www.sff.sad/ajsd.js,组合成的新地址用来返回一个包含我们需要的数据的callback，我们再定义callback执行
+**服务器端设置http hearder**知道即可
+
+### 存储
+**题目**：
+1.请描述一下cookie,sessionStorage 和 localStorage 的区别
+容量
+是否会携带到Ajax中
+Api的易用性
+**知识点**
+1.**cookie**
+1.本来用于客户端和服务器端通信
+2.由于它本身有本地存储的能力，就被“借用”了
+3.使用document.cookie = ....获取和修改即可
+4.cookie用于存储的缺点：
+
+> 存储量太小，只有4kb
+> 所有http请求都带着它，会影响获取资源的xiaol
+> 封装的API太简单了，需要我们自己封装才能用document.cookie = ...
+2.**sessionStorage 和 localStorage**
+它们是专门为存储设计的，因为不会再请求时携带，所以最大容量5M
+API易用：localStorage.setItem(key,value);localStorage.getItem(key,value)
+而sessionStorage是在容量过大时会自动清理，localStorage不会，所以一般用后者
+
+
  
 
 
