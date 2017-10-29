@@ -57,6 +57,29 @@ Cache-Control/Expires则不同，如果检测到本地的缓存还是有效的�
  -  POST请求无法被缓存
  -  HTTP响应头中不包含Last-Modified/Etag，也不包含Cache-Control/Expires的请求无法被缓存
 
+## localstorage
+localStorage是html5的一种新的本地缓存方案，目前用的比较多，一般用来存储ajax返回的数据，加快下次页面打开时的渲染速度。
+
+**localStorage核心API:**
+localStorage.setItem(key, value)    //设置记录 
+localStorage.getItem(key)           //获取记录
+localStorage.removeItem(key)        //删除该域名下单条记录 
+localStorage.clear()                //删除该域名下所有记录 
+  
+## sessionstorage
+sessionStorage和localstorage类似，但是浏览器关闭则会全部删除，api和localstorage相同，实际项目中使用较少。
+
+## application cache
+application cahce是将大部分图片资源、js、css等静态资源放在manifest文件配置中。当页面打开时通过manifest文件来读取本地文件或是请求服务器文件。
+
+## cacheStorage
+CacheStorage是在ServiceWorker的规范中定义的。CacheStorage 可以保存每个serverWorker申明的cache对象，cacheStorage有open、match、has、delete、keys五个核心方法，可以对cache对象的不同匹配进行不同的响应
+**cacheStorage.has()**：如果包含cache对象，则返回一个promise对象。
+**cacheStorage.open()**：打开一个cache对象，则返回一个promise对象。
+**cacheStorage.delete()**：删除cache对象，成功则返回一个promise对象，否则返回false。
+**cacheStorage.keys()**：含有keys中字符串的任意一个，则返回一个promise对象
+
+ 
  
 
  
