@@ -67,6 +67,51 @@ sessionStorage和localStorage有更多丰富易用的接口
  - 使用css3的新属性transform:translate(x,y)属性
  - 使用:before元素
 
- 
+## JS 基础
+**谈一谈JavaScript作用域链**
+**如何理解JavaScript原型链**
+**JavaScript如何实现继承**
+构造继承
+原型继承
+实例继承
+拷贝继承
+ **split() join() 的区别**
+ 前者是切割成数组的形式，后者是将数组转换成字符串
+ **数组方法pop() push() unshift() shift()**
+ push尾部添加pop尾部删除
+ unshift头部添加shift头部删除
+ **IE和DOM事件流的区别**
+ 执行顺序不一样
+ 参数不一样
+ 事件加不加on
+ this指向问题
+ **ajax请求的时候get 和post方式的区别**
+ **IE和标准下有哪些兼容性的写法**
 
- 
+     Var ev = ev || window.event
+    document.documentElement.clientWidth || document.body.clientWidth
+    Var target = ev.srcElement||ev.target
+
+**事件委托是什么** 
+让利用事件冒泡的原理，让自己的所触发的事件，让他的父元素代替执行！
+**闭包是什么，有什么特性，对页面有什么影响?简要介绍你理解的闭包**
+**添加 删除 替换 插入到某个接点的方法**
+
+    obj.appendChidl()
+    obj.innersetBefore
+    obj.replaceChild
+    obj.removeChild
+
+**如何阻止事件冒泡和默认事件**
+function stopBubble(e)
+
+    {
+        if (e && e.stopPropagation)
+            e.stopPropagation()
+        else
+            window.event.cancelBubble=true
+    }
+    
+**谈谈This对象的理解。**
+**了解Node么？Node的使用场景都有哪些？**
+**说一下什么是JavaScript的同源策略**
