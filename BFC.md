@@ -32,5 +32,54 @@
  - display:inline-block IE6/IE7
  - display:table-cell IE8+
 
+## BFC导致的外边距折叠
+
+    <div class="container"> <p>Sibling 1</p> <p>Sibling 2</p> </div>
+    
+    .container { background-color: red; overflow: hidden; /* creates a block formatting context */ } p { background-color: lightgreen; margin: 10px 0; }
+    
+效果为：外边距只有10px，外边距折叠
+
+## 使用BFC来防止外边距折叠
+
+    <style type="text/css">
+    		.container { 
+    			background-color: red; 
+    			overflow: hidden; 
+    		/* creates a block formatting context */ 
+    		} 
+    		p { 
+    		margin: 10px 0; 
+    		background-color: lightgreen; 
+    	    } 
+    	    .newBFC { 
+    	    overflow: hidden;  
+    	}
+    	</style>
+    </head>
+    <body>
+    	<div class="container"> 
+    		<p>Sibling 1</p> 
+    		<p>Sibling 2</p> 
+    		<div class="newBFC"> 
+    			<p>Sibling 3</p> 
+    		</div> 
+    	</div>
+    </body>
+
+ 效果：2和3之间外边距为20px
  
+ ## 使用BFC来包含浮动
+ 子元素浮动之后，无法撑开父元素
  
+ 解决：
+
+     <div class="container">
+      <div>Sibling</div>
+      <div>Sibling</div>
+    </div>
+    .container { overflow: hidden; /* creates block formatting context */ background-color: green; } .container div { float: left; background-color: lightgreen; margin: 10px; }
+
+效果：父元素被撑开
+
+
