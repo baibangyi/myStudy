@@ -57,6 +57,54 @@ firstChild  ==  childNodes[0]
 1.createElement()     创建元素
 2.createTextNode()    创建文本节点
 
+## 数组
+### 创建一个数组的方法
+1.new Array（）实例对象
+可以传入数组长度new Array（5）
+可以复制new Array([1,2,3])
+2.创建表达式
+var arr1 = []
+可以直接复制var arr1 = [1,2,3]
+
+### 数组的内置方法们
+1.length（）  返回数组长度
+2.push（） 从数组尾部添加
+3.unshift（） 从数组头部添加
+4.pop() 从数组尾部删除
+5.shift（） 从数组头部删除
+6.concat（） 合并两个数组
+7.join（） 把当前数组用指定字符串连接起来，并返回的字符串
+8.slice（） 截取数组部分长度，并返回新数组
+9.splice（） 在指定位置添加/删除指定位数的数组项
+10.indexof（） 返回指定数组项的位置索引，没有返回-1
+11.sort（） 将数组重新排序后，返回新数组
+12.reverce（） 将数组倒序后返回新数组
+
+### 数组去重
+1.基本数组去重
+
+    array.prototype.unique = function(){
+    	var result = [];
+    	this.foreach(function(v){
+    		if(result.indexof(v) , 0) {
+    			result.push(v)
+    		}
+    		return result
+    	})
+    }
+
+2.先排序在去重
+
+    array.prototype.unique = function(){
+    	var result = [];
+    	this.foreach(function(v){
+    		if(result.indexof(v) , 0) {
+    			result.push(v)
+    		}
+    		return result
+    	})
+    }
+
 ## 合并对象
 1.jQuery.extend([deep], target, object1, [objectN])
 2.用 Object.assign()
@@ -69,7 +117,12 @@ firstChild  ==  childNodes[0]
            }
         }
     }
-    
+4.展开符
+
+    let arr = ['b','c']
+    ['a',...arr,'d']
+    //['a','b','c','d']
+
 ## map 和 foreach的区别
 map是根据函数执行后返回一个新数组，foreach是没有返回值的，所以没有办法终止或跳出循环的
 
@@ -87,4 +140,31 @@ etag是将文件的索引（INode），大小（Size）和最后修改时间（M
  如果过期了将etag发送给服务器，与服务器上的资源的校验串进行比对，决定是200还是304.
 etag解决了可以比Last-Modified更精确，精确到了毫秒级。
 如果文件被定期生成但是内容却没有任何变化Last-Modified也不能正确判断
+
+## js的几种数据类型
+number boolean object undefined string null
+
+## js的几种引用类型
+函数，对象，数组
+
+## js的几种内置对象
+number string Function Array Object Boolean Date Math Regexp
+
+## js的同步和异步
+个人总结：由于js的主要用途是与用户交互以及操作Dom树，所以他只能是单线程的，所谓同步就是把任务放在主线程上，一次执行，只有执行完上一个任务才能执行下一个任务，而异步就是不进入主线程的任务，而进入任务队列中，在主线程的任务都结束了，之后，在来执行队列中的人物
+
+## 标签语义化的理解
+根据内容结构化选择合适的标签便于开发者阅读和浏览器爬虫爬去数据
+好处是： 
+1.可以在css加载失败时，页面也能呈现出良好的效果
+2.在团队开发中，语义化标签有利于课增强可读性
+3.便于搜索引擎，爬虫是根据标签确定还是那个下文的
+4.方便其他设备解析代码
+html5新增的语义化标签：header，footer,nav,articl,section,asied
+注意点：
+1.input标签对应的说明文本要用label标签，
+2.使用表格时，标题用caption，表头用tHead，主体用tBody
+
+
+
 
