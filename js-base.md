@@ -251,3 +251,20 @@ html5新增的语义化标签：header，footer,nav,articl,section,asied
 1.dom0的click时间是写在html标签里的或者js的var click= function
 dom2的click事件是addEventListen或者removeEvrnyListenr，接收三个参数，第一个是事件类型，第二个是定义的执行函数，第三个是boolean值，false表示事件冒泡，true表示事件捕获；
 2.dom0是会被覆盖的，而dom2不会被覆盖
+
+## Express框架
+框架核心：中间件，路由器，模板引擎（jade，ejs）
+1.中间件：处理http请求的函数，她接受三个参数：request（req），respone（res），next（）回掉函数。
+2.路由器：框架可以配置路由，可以配置根路径或者指定特定的路径，它拥有get和post方法，接收两个参数：路径和回调函数
+3.模板引擎：node的模板引擎一般有两种：jade和ejs。要设置模板引擎就调用set方法，调用模板引擎就调用rander方法
+
+## 居中问题
+个人将他分为定宽与不定宽
+1.不定宽：
+第一种：针对内联元素或者属性为inline-block的元素，需要设置他的父元素
+text-algin和verticle-algin都为center就可以了
+第二种：利用绝对定位实现，让他的父元素为相对定位，子元素为绝对定位，设置他们的left和top都为50%，在利用transform：translate（-50%，-50%），将他们拉回中间位置
+第三种：利用弹性布局。设置父元素为flex属性，将他的justify-content和algin-item设置为center
+
+2.定宽：
+主要是针对水平居中，对于定宽div居中，设置他的margin：0 auto
