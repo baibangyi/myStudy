@@ -104,6 +104,10 @@ var arr1 = []
     		return result
     	})
     }
+    
+### 数组的删除
+有两种方法删除，第一种用delete方法，delete arr[0]，这种方法知识将arr[0]这一项变味了undefined，数组的长度是不变的
+另一种方法就是splice方法，这个方法接收至少两个参数，第一个参数表示从第几位开始删除（索引值），第二个参数表示要删除多少项，假如要清空数组，就可以将第二个参数设为arr.length
 
 ## 合并对象
 1.jQuery.extend([deep], target, object1, [objectN])
@@ -312,3 +316,51 @@ text-algin和verticle-algin都为center就可以了
 就是当一个变量被声明并被赋值时，就给他的引用计数+1，当他的值变为另一个值得时候，他的引用计数就要-1，当一个变量的计数为0时，就说明他要被清楚了
 但技术清除有一个问题就是遇到死循环，就是a引用了b，b也引用了a的时候
 3.什么时候出发垃圾回收机制，当内存分配量小于程序的15%就清除，大于85%就清除
+
+## 浮动 & 清浮动
+1.浮动产生的BUG：由于浮动元素脱离文档流，所以当子元素浮动，而父元素有没有设置宽高的时候，就会产生子元素撑不开父元素的情况
+2.清浮动：有三种方法
+给浮动元素添加伪类，其实就是添加一个rander DOm节点，设置他的属性为clear：both
+添加一个节点，也设置他的属性为clear：both，实现原理与前一种一样
+最后一种就是给父元素添加overflow：auto的属性清浮动，实际上是触发了bfc
+
+## BFC
+BFC的触发：
+1.overflow为hidden，auto，scroll
+2.display为table-cell，inline-block
+BFC的可以解决外边距重叠的问题也可以解决浮动的问题
+
+## 说说闭包
+闭包就是内部函数与外部函数的一座沟通桥梁，有了它外部函数可以访问内部函数的变量，同时外部函数的变量由于被内部函数引用，所以不会被回收
+闭包有两种形式，一种是作为参数传入，一种是作为值返回
+
+## 谈谈this
+this是在函数调用时确定的，就是在执行上下文确定的时候确定，他指向调用他的对象，在构造函数中的this是指向构造的这个对象的，原型中的this指向原型对象，
+call和apply可以指定this指向的对象
+
+## inline-block的间隙问题
+水平间隙：
+1.给父元素添加font-size为0
+2.删除换行，例如使item</li><li>
+3.采用注释的方法。把换行编程<--!-->
+4.丢置标签不要</li>
+5.利用子元素的负外边距
+垂直间隙：给子元素添加verticle-algin为bootom
+
+
+## Z-index可以设置为负数么？设为负数有什么用？
+可以，只要一个元素设置为position非static定位，且z-index为负数，那么该元素就会被普通文档流覆盖
+
+## html5 & css3 引入的新特性
+1.html5：
+用于绘画的canvas
+用于媒介回访的video和audio
+对本地离线缓存有了提升
+增加了一些新标签<header><footer><nav><section><article>,是标签语义化
+
+2.css3
+动画效果transform，常用的有定位translate，sclae缩放
+border-radius圆角  box-shadow阴影
+引入了唯一的伪元素：：selection
+
+
