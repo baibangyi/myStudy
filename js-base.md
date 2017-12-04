@@ -33,6 +33,7 @@ undefined：是设置了但没赋值
 appendChild()  在childNodes列表末尾添加节点
 insertBefore() 在childNodes列表指定位置添加节点
 replaceChild() 替换列表中的某节点
+替换的新节点是document创建的，不是var声明的
 removeChild()  移出列表中的某节点
 
 ### Document类型
@@ -56,12 +57,14 @@ firstChild  ==  childNodes[0]
 ### 创建
 1.createElement()     创建元素
 2.createTextNode()    创建文本节点
+document.createElement();document.createTextNode()这样调用
 
 ## 数组
 ### 创建一个数组的方法
 1.new Array（）实例对象
 可以传入数组长度new Array（5）
 可以复制new Array([1,2,3])
+返回的数组长度为1，就是创建了一个数组，数组里面只有一项，这一项也是数组，就是二维数组
 2.创建表达式
 var arr1 = []
 可以直接复制var arr1 = [1,2,3]
@@ -75,10 +78,10 @@ var arr1 = []
 6.concat（） 合并两个数组
 7.join（） 把当前数组用指定字符串连接起来，并返回的字符串
 8.slice（） 截取数组部分长度，并返回新数组
-9.splice（） 在指定位置添加/删除指定位数的数组项
+9.splice（） 在指定位置添加/删除指定位数的数组项，返回新数组
 10.indexof（） 返回指定数组项的位置索引，没有返回-1
 11.sort（） 将数组重新排序后，返回新数组
-12.reverce（） 将数组倒序后返回新数组
+12.reverse（） 将数组倒序后返回新数组
 
 ### 数组去重
 1.基本数组去重
@@ -98,7 +101,7 @@ var arr1 = []
     array.prototype.unique = function(){
     	var result = [];
     	this.foreach(function(v){
-    		if(result.indexof(v) , 0) {
+    		if(result.indexof(v) < 0) {
     			result.push(v)
     		}
     		return result
