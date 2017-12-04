@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>操作节点</title>
+</head>
+<body>
+	<ul id="father" class="bab">
+		<li id="son" title="FChild">我是1列</li>
+		<li>我是2列</li>
+		<li>我是3列</li>
+		<li>我是4列</li>
+	</ul>
+</body>
+<script type="text/javascript">
+	var F = document.getElementById('father')
+	console.log(F.childNodes) //获取子元素列表，但这种方法会把换行看作text节点
+	console.log(F.firstChild) //获取第一个子元素
+	console.log(F.lastChild) //获取最后一个子元素
+
+	var S = document.getElementById('son')
+	console.log(son.parentNode) //返回父节点
+	console.log(son.ownerDocument) //返回祖先节点
+
+	//创建节点
+	var L = document.createElement('li')
+	var A = document.createElement('a')
+	L.innerHTML = '我是5列'
+	A.href = '#'
+	A.innerHTML = '我是一个链接'
+
+	//插入节点
+	F.appendChild(L)
+    F.insertBefore(A,S)
+
+    //替换节点
+    var L2 = document.getElementsByTagName('li')[1]
+    var text = document.createTextNode('我是被替换的第2列')
+    L2.replaceChild(text,L2.childNodes[0])
+
+    //删除节点
+    var L3 = document.getElementsByTagName('li')[2]
+    F.removeChild(L3)
+
+    //获取属性
+    var attr1 = S.getAttribute('title')
+    console.log(attr1)
+
+    //设置属性
+    S.setAttribute('title','updateAttr')
+    console.log(S.getAttribute('title'))
+
+    //移出属性
+    S.removeAttribute('title')
+    console.log('已移除title属性')
+</script>
+</html>

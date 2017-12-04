@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>数组操作</title>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript">
+	//创建数组的方法们
+	var arr1 = new Array()
+	console.log(arr1)
+
+	var arr2 = new Array(5)
+	console.log(arr2.length)
+
+	var arr3 = new Array(['a','b','c',1,2,3])
+	console.log('arr3的长度为' + arr3.length)
+
+	var arr4 = ['a',1,2,3,10]
+	console.log(arr4)
+	console.log(arr4.length)
+
+	//数组拥有的内置方法
+	var arr = [1,2,3]
+
+	//返回长度
+	console.log(arr.length)
+
+	//从数组尾部添加数组项
+	arr.push(4)
+	console.log(arr)
+
+	//从数组尾部删除数组项
+	arr.pop()
+	console.log(arr)
+
+	//从数组头部插入数组项
+	arr.unshift(0)
+	console.log(arr)
+
+	//从数组头部删除数组项
+	arr.shift()
+	console.log(arr)
+
+	//合并两个数组
+	var arrX = [4,5,6]
+	arr.concat(arrX)
+	console.log(arr)
+
+	//将数组放入一个字符串中
+	var a = []
+	a[0] = 'a'
+	a[1] = 'b'
+	a[2] = 'c'
+
+	a.join('-')
+	console.log(a)
+
+	//返回数组指定位置的数组段
+    arr.slice(0,1)
+	console.log(arr)
+
+	//删除数组指定位置指定位数的数组项（如要添加可以加参数）
+	arr.splice(0,1,5,6)
+	console.log(arr)
+
+	//返回指定数组项的索引值，没有返回-1
+	console.log(arr.indexOf(1))
+	console.log(arr.indexOf(8))
+
+	//数组排序
+	var arrY = [5,7,6,9]
+	console.log(arrY.sort())
+
+	//数组倒叙
+	arrY.reverse()
+
+	//数组去重
+	var arrZ = [1,1,2,2,3,2,4,5]
+	function unique (arr) {
+		var result = []
+		arr.forEach(function(v) {
+			if(result.indexOf(v) <0) {
+				result.push(v)
+			}
+			console.log(result)
+		})
+	}
+	unique(arrZ)
+
+	//两重循环，第一重循环数组项，第二层用作比较，相同则跳过，不同就放入新数组  耗能
+	function unique1 (arr) {
+		var result = []
+		for(var i= 0; i<arr.length; i++) {
+			for(var j=i+1;j<arr.length;j++){
+				if(arr[i] === arr[j]) {
+					j++
+				}
+			}
+			result.push(arr[1])
+		}
+		console.log('第二'+result)
+	}
+	unique(arrZ)
+
+	//两重循环，第一重循环数组项，第二层用作比较。相同就删除这个值，并将长度-1 耗能
+	function unique2 (arr) {
+		for(var i=0;i<arr.length;i++) {
+			for(var j=i+1;j<arr.length;j++) {
+				if(arr[i] === arr[j]) {
+					arr.splice(j,1)
+					arr.length--
+					j--
+				}
+			}
+		}
+		console.log(arr)
+	}
+	unique2(arrZ)
+
+	//
+</script>
+</html>

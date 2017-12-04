@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript">
+	var myarr = ['value1','value2','value3','value4']
+	var myobj = {
+		key1:"value1",
+		key2:"value2",
+		key3:function(){
+			console.log('我是key3')
+		}
+	}
+
+//JS原声遍历数组和对象
+
+	//遍历数组，i为数组项
+	function arrayEach(arr) {
+		for(var i=0;i<arr.length;i++){
+			console.log(i+':'+arr[i])
+		}
+	}
+	arrayEach(myarr)
+
+	//遍历对象，key为索引值
+	function objEach(obj){
+		for(var key in obj){
+			console.log(key+':'+obj[key])
+		}
+	}
+	objEach(myobj)
+
+	//遍历数组，接收三个参数：值，索引，数组
+	function arrForEach(arr) {
+		arr.forEach(function(value,index,arr) {
+			console.log(arr + '的' + index + '值：' + value)
+		})
+	}
+	arrForEach(myarr)
+
+	//ES6的遍历方法for of 1.数组
+	function allArr(arr){
+		for(var i of arr){
+			console.log('新方法遍历' + i + ':' + arr[i])
+		}
+	}
+	allArr(myarr)
+
+	//ES6的遍历方法for of 2.map对象
+	function allObj () {
+		var obj = new Map([["a:",1],["b:",2],["c:",3]])
+		for(var [key,value] of obj){
+			console.log('新方法遍历Map对象' + key + ':' + value)
+		}
+	}
+	allObj();
+
+	//ES6的遍历方法 for of 3.字符串
+	function allWord(word) {
+		for(var i of word) {
+			console.log(i)
+		}
+	}
+	allWord('julie')
+
+	//Object.keys()遍历属性名，返回有属性名（键）组成的数组
+	function allKey(){
+		let arr1 = ['a','b','c'] //一般数组
+		let likeObj = {100:'a',2:'b',7:'c'} //类对象
+		let obj1 = {'z':1,'x':2,'y':3} //一般对象
+
+		console.log('一般数组' + Object.keys(arr1))
+		console.log('类对象' + Object.keys(likeObj))
+		console.log('一般对象' + Object.keys(obj1))
+	}
+	allKey();
+
+//jQuery遍历方法有$each()
+//underscore遍历方法_each(),underscroe是一个插件
+</script>
+</html>
