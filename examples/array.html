@@ -119,5 +119,55 @@
 		console.log(arr)
 	}
 	unique2(arrZ)
+
+	//先排序，再从最后开始比较，相同，则删除
+	function unique3 (arr) {
+		arr.sort(function(a,b) {
+			return (a-b)
+		})
+		function loop(index) {
+			if(index >= 1) {
+				if(arr[index] === arr[index-1]) {
+					arr.splice(index,1)
+				}
+				loop(index-1)
+			}
+		}
+		loop(arr.length-1)
+		console.log('第三种去重' + arr)
+	}
+	unique3(arrZ)
+
+	//利用对象属性不能相同的特点
+	function unique4(arr) {
+		var obj = {}
+		var result = []
+		for(var i= 0; i<arr.length;i++) {
+			if(!obj[arr[i]]){
+				obj[arr[i]] = 1
+				result.push(arr[i])
+			}
+		}
+		console.log('第四种' + arr)
+	}
+	unique4(arrZ)
+
+	//利用indexOf和forEach（或者map，filter）
+	function unique5(arr) {
+		var result = []
+		arr.forEach(function(v,i,arr){
+			if(arr.indexOf(v,i+1) === -1){
+				result.push(v)
+			}
+		})
+		console.log('第五种' + arr)
+	}
+	unique5(arrZ)
+
+	//ES6的新增 利用Array.from将Set结构转换成数组
+	function unique6(arr) {
+		console.log(Array.from(new Set(arr)))
+	}
+	unique6(arrZ)
 </script>
 </html>

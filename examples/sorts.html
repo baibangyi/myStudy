@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>排序</title>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript">
+	var arr = [2,8,5,6,8,11,45,25,65]
+
+	//冒泡排序，相邻两项进行比较，反序则交换
+    // function bobblesort(arr) {
+    // 	for(var i = 0; i<arr.length; i++) {
+    // 		for(var j = arr.length-i-1;j<arr.length;j++) {
+    // 			if(arr[j]>arr[j+1]){
+    // 				var temp = arr[j]
+    // 				arr[j] = arr[j+1]
+    // 				arr[j+1] = temp
+    // 			}
+    // 		}
+    // 	}
+    // 	return arr
+    // }
+    // bobblesort(arr)
+    // console.log(arr)
+
+    //选择排序 时间复杂度最稳定的一种 n^2 定义一个最小的，与之比较
+    function selectionsort (arr) {
+    	for (var i = 0;i<arr.length-1;i++) {
+    		var minNumber = i
+    		for(var j = i+1;j<arr.length;j++) {
+    			if(arr[j]<arr[minNumber]){
+    				minNumber = j
+    			}
+    		}
+    	        var temp = arr[i]
+    	        arr[i] = arr[minNumber]
+    	        arr[minNumber] = temp
+    	}
+    	return arr
+    }
+    selectionsort(arr)
+    console.log(arr)
+</script>
+</html>
