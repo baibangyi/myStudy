@@ -114,7 +114,14 @@ var arr1 = []
 
 ## 合并对象
 1.jQuery.extend([deep], target, object1, [objectN])
+
+> $.extend({},obj1,obj2) //此时obj1没被修改，obj3 !== obj1 $.extend(obj1,obj2)
+> //此时obj1已被修改 obj4 = obj1
+
 2.用 Object.assign()
+
+> Object.assign(obj1,obj2) //此时obj1本身也被改变
+
 3.遍历赋值法 
 
     var extend = function(o,n){
