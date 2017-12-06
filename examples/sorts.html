@@ -10,23 +10,44 @@
 <script type="text/javascript">
 	var arr = [2,8,5,6,8,11,45,25,65]
 
-	//冒泡排序，相邻两项进行比较，反序则交换
-    // function bobblesort(arr) {
-    // 	for(var i = 0; i<arr.length; i++) {
-    // 		for(var j = arr.length-i-1;j<arr.length;j++) {
-    // 			if(arr[j]>arr[j+1]){
-    // 				var temp = arr[j]
-    // 				arr[j] = arr[j+1]
-    // 				arr[j+1] = temp
-    // 			}
-    // 		}
-    // 	}
-    // 	return arr
-    // }
-    // bobblesort(arr)
-    // console.log(arr)
+	//1.冒泡排序，相邻两项进行比较，反序则交换
+    function bobblesort(arr) {
+    	for(var i = 0; i<arr.length; i++) {
+    		for(var j = arr.length-i-1;j<arr.length;j++) {
+    			if(arr[j]>arr[j+1]){
+    				var temp = arr[j]
+    				arr[j] = arr[j+1]
+    				arr[j+1] = temp
+    			}
+    		}
+    	}
+    	return arr
+    }
+    bobblesort(arr)
+    console.log(arr)
 
-    //选择排序 时间复杂度最稳定的一种 n^2 定义一个最小的，与之比较
+    //1*.改进后的冒泡排序
+    function abobblesort(arr) {
+        var len  = arr.length
+        var i = len -1
+        if(i>0){
+            pos = 0
+        }
+        for(var j = 0;j<i;j++) {
+            if(arr[j]>arr[j+1]){
+                var temp = arr[j]
+                arr[j] = arr[j+1]
+                arr[j+1] = temp
+                pos = j
+            }
+            i = pos
+        }
+        return arr
+    }
+    abobblesort(arr)
+    console.log(arr)
+
+    //2.选择排序 时间复杂度最稳定的一种 n^2 定义一个最小的，与之比较
     function selectionsort (arr) {
     	for (var i = 0;i<arr.length-1;i++) {
     		var minNumber = i
@@ -42,6 +63,90 @@
     	return arr
     }
     selectionsort(arr)
+    console.log(arr)
+
+    //3.插入排序 以序列第一项为一个子序列，从第二个序列项开始逐个插入
+    function insertionsort(arr) {
+        for(var i=0;i<arr.length;i++) {
+            var preIndex = i-1
+            var current = arr[i]
+            while(preIndex >=0 && arr[preIndex] > arr[i]) {
+                arr[preIndex+1] = arr[preIndex]
+                preIndex--
+            }
+            arr[preIndex+1] = current
+        }
+        return arr
+    }
+    insertionsort(arr)
+    console.log(arr)
+
+    //4.归并排序 将序列分为两个子序列，对两个子序列进行归并排序知道有序，最后将两个子序列合并
+    function megersort(arr) {
+        var len = arr.length
+        if(len<2) {
+            return arr
+        }
+        var middle = Math.floor(len/2)
+        var left = arr.slice(0,middle)
+        var right = arr.slice(middle)
+        return meger(megersort(left),megersort(right))
+    }
+
+    function meger(left,right) {
+        var lenL = left.length
+        var lenR = right.length
+        var result = []
+        while(lenL > 0 && lenR > 0) {
+            if(left[0] <= right[0]){
+                result.push(left.shift())
+            } else {
+                result.push(right.shift())
+            }
+        }
+
+        while (lenL){
+            result.push(left.shift())
+        }
+        while(lenR) {
+            result.push(right.shift())
+        }
+        return result
+    }
+    megersort(arr)
+    console.log(arr)
+
+    //5.快排 选择一个关键字，把序列分为两部分，左边<关键字，右边>关键字
+    function quicksort(arr , left, right) {
+        var len = arr.length,
+            piovtIndex,
+        left = typeof left != 'number' ? 0 : left,
+        right = typeof right != 'number' ? len - 1 : right;
+        if(left<right){
+            piovtIndex = partition(arr,left,right)
+            quicksort(arr,left,piovtIndex-1)
+            quicksort(arr,piovtIndex+1,right)
+        }
+    }
+    function partition(arr,left,right) {
+        var piovt = left
+        var index = piovt + 1
+        for(var i = index;i<right;i++) {
+            if(arr[i] < arr[piovt]) {
+                swap(arr,i,piovt)
+                index++
+            }
+            swap(arr,piovt,index-1)
+            return index-1
+        }
+    }
+
+    function swap(arr,i,j) {
+        var temp = arr[i]
+        arr[i] = arr[j]
+        arr[j] = temp
+    }
+    quicksort(arr,0,arr.length-1)
     console.log(arr)
 </script>
 </html>
