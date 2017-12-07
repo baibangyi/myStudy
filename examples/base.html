@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>常见基础题联系</title>
+</head>
+<body>
+	
+</body>
+<script type="text/javascript">
+	//b是全局变量 a是局部变量
+	// (function () {
+	// 	var a = b = 3
+	// })()
+	// 	// console.log(a)
+	// 	console.log(b)
+
+    //caller  返回正在被执行的函数的引用
+    function a() {
+    	console.log(a.caller)
+    }
+    function b(){
+    	a()
+    }
+    b()
+
+    //callee 返回正在执行函数的引用  他的arguments是一个属性
+    function c() {
+    	console.log(arguments.callee)
+    }
+    function d(){
+    	c()
+    }
+    d()
+</script>
+</html>

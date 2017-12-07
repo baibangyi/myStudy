@@ -425,6 +425,52 @@ border-radius圆角  box-shadow阴影
 希尔排序:O(nlogN)
 
 
+## 如何判断是否为数据类型
+1.typeOf可以检测是否为数组类型
+2.判断其是否拥有“数组性质”，如slice
+3.兼容非常好的方法：Array.isArray
+
+## 添加点击事件的方法
+1.直接在DOM里绑定click事件
+2.在js中，通过onclick绑定
+3.通过事件添加进行绑定，addEventListener
+
+## 将IE盒子转换为标准盒子
+1.利用box-sizing可以实现
+2.box-sizing有三个值：
+content-box：宽高不包含padding和border
+padding-box：宽高只包含padding
+border-box：宽高只包含border
+
+## IE和DOM事件流的区别?
+IE采用冒泡型事件，DOM采用先捕获再冒泡
+另外还有事件侦听也不同：
+IE是attachEvent，dettachEvent
+Dom是addEventListener，removeEventListener
+
+## IE和标准下有哪些兼容性的写法
+var ev = ev || window.event
+document.documentElement.clientWidth || document.body.clientWidth
+var target = ev.srcElement || ev.target
+
+## document.load 和 document.ready 的qubie
+1.load是页面Dom树加载完成，且css，图片，js加载完毕之后才会执行
+这种情况常用于检测一个页面（包含他的附属文件）是否加载完毕
+2.ready就是只加载了Dom树，css，图片，js这些都还没有加载
+如果想要尽早执行js代码，可以用ready
+
+## Javascript中callee和caller的作用
+callee是返回正在被执行的函数引用，它是一个arguments的属性，它具有length属性，可以利用这个属性来比较形参和实参的长度
+caller也是返回调用当前函数的引用，且，caller属性只有在函数执行时才有定义，当函数为顶层调用时，想全局调用，就会返回null
+
+## 函数声明 和 函数表达式 的区别
+js解析器在解析代码的时候，会保证所有生命先被解析，而表达式只有在执行的时候才会被解析，所以函数声明和函数表达式最主要的区别就是，可以在函数声明之前调用函数，而表达式不行
+
+## 在Javascript中什么是伪数组？如何将伪数组转化为标准数组
+1.伪数组就是类数组，有函数中的隐藏变量，arguments，他表示所有参数的集合，还有就是利用document.getElementById()方法获取的NodeList，
+2.将arguments转换为证数组的方法是Array原型上的slice方法，但NodeList不能使用这个方法，不兼容，的那可以通过遍历的方法，简历一个空数组，将list的每一项放进空数组
+
+
 
 
 
